@@ -1,157 +1,227 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Happiness Journey</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f4f9f9;
-      padding: 20px;
-    }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    h1 {
-      color: #333;
-    }
+<title>Happiness Journey</title>
 
-    select {
-      padding: 8px;
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-      max-width: 500px;
-      margin: 20px auto;
-    }
+<style>
 
-    .cell {
-      padding: 15px;
-      background: #ffffff;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 1px solid #ddd;
-      transition: 0.2s;
-    }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
 
-    .cell:hover {
-      background: #dff6f0;
-      transform: scale(1.05);
-    }
+body{
+background:linear-gradient(135deg,#667eea,#764ba2);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+padding:20px;
+}
 
-    #result {
-      margin-top: 30px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #444;
-      min-height: 50px;
-    }
-  </style>
+.container{
+max-width:900px;
+width:100%;
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(15px);
+border-radius:20px;
+padding:30px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+h1{
+margin-bottom:20px;
+font-weight:700;
+}
+
+.controls{
+margin-bottom:20px;
+}
+
+select{
+padding:10px;
+border:none;
+border-radius:10px;
+font-size:16px;
+outline:none;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:10px;
+margin-top:20px;
+}
+
+.cell{
+background:white;
+color:#333;
+padding:15px;
+border-radius:12px;
+font-weight:600;
+cursor:pointer;
+transition:all 0.2s ease;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.cell:hover{
+transform:scale(1.08);
+background:#ffe082;
+}
+
+.result{
+margin-top:25px;
+background:rgba(255,255,255,0.15);
+padding:20px;
+border-radius:12px;
+font-size:18px;
+min-height:60px;
+}
+
+.footer{
+margin-top:10px;
+font-size:13px;
+opacity:0.8;
+}
+
+</style>
 </head>
+
 <body>
 
-  <h1>Happiness Journey 🎉</h1>
+<div class="container">
 
-  <label>Select Your Genre:</label>
-  <br><br>
-  <select id="genre">
-    <option value="fitness">Energy Builder 💪</option>
-    <option value="artist">Creative Soul 🎨</option>
-    <option value="mind">Inner Peace 🌿</option>
-    <option value="social">Heart Connector ❤️</option>
-  </select>
+<h1>🎉 Happiness Journey Game</h1>
 
-  <div class="grid" id="board"></div>
+<div class="controls">
 
-  <div id="result">Tap your board position to get a task!</div>
+<label>Select Your Genre</label>
+<br><br>
 
-  <script>
-    const tasks = {
-      fitness: [
-        "Do 15 jumping jacks.",
-        "Hold a plank for 20 seconds.",
-        "Do 10 squats while smiling.",
-        "Take 5 deep breaths and lead the group.",
-        "Share one healthy habit you want to build.",
-        "Do 10 pushups (or knee pushups).",
-        "Teach one quick stretch.",
-        "Rate your energy level and explain why."
-      ],
-      artist: [
-        "Draw your current mood in 30 seconds.",
-        "Create a 4-line mini poem about happiness.",
-        "Act out an emotion silently.",
-        "Doodle something using only circles.",
-        "Create a 10-second motivational slogan.",
-        "Describe your dream life in 3 creative words.",
-        "Collaborate on a quick story.",
-        "Share a moment creativity made you happy."
-      ],
-      mind: [
-        "Share one thing you're grateful for.",
-        "Close eyes for 20 seconds and describe sounds.",
-        "Say a positive affirmation.",
-        "Share one challenge that made you stronger.",
-        "Compliment yourself genuinely.",
-        "Describe your ideal peaceful day.",
-        "Name one small win this week.",
-        "Forgive yourself for something small."
-      ],
-      social: [
-        "Give a genuine compliment to a player.",
-        "Make the group laugh in 15 seconds.",
-        "Thank someone sincerely.",
-        "Ask a meaningful question to a player.",
-        "Say something that would cheer someone up.",
-        "Share what friendship means to you.",
-        "Do a 10-second handshake with someone.",
-        "Share one way to spread kindness."
-      ]
-    };
+<select id="genre">
+<option value="fitness">💪 Fitness</option>
+<option value="artist">🎨 Artist</option>
+<option value="mind">🌿 Inner Peace</option>
+<option value="social">Social ❤️ r</option>
+</select>
 
-    const specialCards = [
-      "⭐ Roll again and move forward!",
-      "⭐ Choose a player. They must complete 2 tasks next turn.",
-      "⭐ You may skip your next task.",
-      "⭐ Everyone shares one gratitude moment.",
-      "⭐ Swap positions with another player.",
-      "⭐ Gain 2 Happiness Points!"
-    ];
+</div>
 
-    const board = document.getElementById("board");
+<div class="grid" id="board"></div>
 
-    // Create grid 2–49
-    for (let i = 2; i <= 49; i++) {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      cell.innerText = i;
+<div class="result" id="result">
+Tap a board number to reveal your task!
+</div>
 
-      cell.onclick = function() {
-        getTask(i);
-      };
+<div class="footer">
+Scan • Play • Spread Happiness ✨
+</div>
 
-      board.appendChild(cell);
-    }
+</div>
 
-    function getTask(position) {
-      const genre = document.getElementById("genre").value;
-      const result = document.getElementById("result");
+<script>
 
-      // Example logic: multiples of 7 = special card
-      if (position % 7 === 0) {
-        const randomSpecial = specialCards[Math.floor(Math.random() * specialCards.length)];
-        result.innerText = randomSpecial;
-      } else {
-        const genreTasks = tasks[genre];
-        const randomTask = genreTasks[Math.floor(Math.random() * genreTasks.length)];
-        result.innerText = randomTask;
-      }
-    }
-  </script>
+const tasks={
+fitness:[
+"Do 15 jumping jacks.",
+"Hold a plank for 20 seconds.",
+"Do 10 squats while smiling.",
+"Take 5 deep breaths and lead the group.",
+"Share one healthy habit you want to build.",
+"Do 10 pushups or knee pushups.",
+"Teach one quick stretch.",
+"Rate your energy level from 1-10."
+],
+
+artist:[
+"Draw your current mood in 30 seconds.",
+"Create a 4-line poem about happiness.",
+"Act out an emotion silently.",
+"Doodle something using only circles.",
+"Create a motivational slogan.",
+"Describe your dream life in 3 words.",
+"Collaborate to make a quick story.",
+"Share a moment creativity made you happy."
+],
+
+mind:[
+"Share one thing you're grateful for.",
+"Close eyes for 20 seconds and describe sounds.",
+"Say a positive affirmation.",
+"Share a challenge that made you stronger.",
+"Compliment yourself genuinely.",
+"Describe your ideal peaceful day.",
+"Name one small win this week.",
+"Forgive yourself for something small."
+],
+
+social:[
+"Give a genuine compliment to a player.",
+"Make the group laugh in 15 seconds.",
+"Thank someone sincerely.",
+"Ask another player a meaningful question.",
+"Say something that would cheer someone up.",
+"Share what friendship means to you.",
+"Do a 10-second handshake with someone.",
+"Share one way to spread kindness."
+]
+};
+
+const specialCards=[
+"⭐ Roll the dice again and move forward!",
+"⭐ Choose a player. They must complete 2 tasks next turn.",
+"⭐ You may skip your next task.",
+"⭐ Everyone shares one gratitude moment.",
+"⭐ Swap positions with another player.",
+"⭐ Gain 2 Happiness Points!"
+];
+
+const board=document.getElementById("board");
+
+for(let i=2;i<=49;i++){
+
+const cell=document.createElement("div");
+
+cell.className="cell";
+cell.innerText=i;
+
+cell.onclick=function(){
+getTask(i);
+};
+
+board.appendChild(cell);
+}
+
+function getTask(position){
+
+const genre=document.getElementById("genre").value;
+const result=document.getElementById("result");
+
+if(position%7===0){
+
+const special=specialCards[Math.floor(Math.random()*specialCards.length)];
+result.innerText=special;
+
+}
+else{
+
+const genreTasks=tasks[genre];
+const task=genreTasks[Math.floor(Math.random()*genreTasks.length)];
+result.innerText=task;
+
+}
+
+}
+
+</script>
 
 </body>
 </html>
