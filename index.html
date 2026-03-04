@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Happiness Journey</title>
@@ -10,86 +11,144 @@
 <style>
 
 *{
+box-sizing:border-box;
 margin:0;
 padding:0;
-box-sizing:border-box;
 font-family:'Poppins',sans-serif;
 }
 
 body{
-background:linear-gradient(135deg,#667eea,#764ba2);
+background:linear-gradient(135deg,#5f9cff,#7c4dff);
 min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
+padding:15px;
 color:white;
-padding:20px;
 }
 
 .container{
-max-width:900px;
 width:100%;
+max-width:900px;
 background:rgba(255,255,255,0.1);
 backdrop-filter:blur(15px);
 border-radius:20px;
-padding:30px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
+padding:20px;
 text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
 
 h1{
-margin-bottom:20px;
-font-weight:700;
+margin-bottom:15px;
 }
 
 .controls{
-margin-bottom:20px;
+margin-bottom:15px;
 }
 
 select{
 padding:10px;
-border:none;
 border-radius:10px;
+border:none;
 font-size:16px;
-outline:none;
 }
+
+/* Dice */
+
+.dice{
+font-size:50px;
+margin:10px;
+transition:transform 0.3s;
+}
+
+.roll{
+animation:spin 0.6s;
+}
+
+@keyframes spin{
+0%{transform:rotate(0)}
+100%{transform:rotate(360deg)}
+}
+
+/* Board */
 
 .grid{
 display:grid;
-grid-template-columns:repeat(7,1fr);
 gap:10px;
-margin-top:20px;
+margin-top:10px;
+grid-template-columns:repeat(7,1fr);
 }
 
 .cell{
 background:white;
 color:#333;
-padding:15px;
 border-radius:12px;
+padding:16px;
 font-weight:600;
 cursor:pointer;
-transition:all 0.2s ease;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
+box-shadow:0 4px 12px rgba(0,0,0,0.15);
+transition:0.2s;
 }
 
 .cell:hover{
-transform:scale(1.08);
-background:#ffe082;
+transform:scale(1.1);
+background:#ffd54f;
 }
 
+/* selected tile */
+
+.active{
+background:#ff7043 !important;
+color:white;
+transform:scale(1.15);
+}
+
+/* Result */
+
 .result{
-margin-top:25px;
-background:rgba(255,255,255,0.15);
-padding:20px;
+margin-top:15px;
+background:rgba(255,255,255,0.2);
+padding:15px;
 border-radius:12px;
-font-size:18px;
+font-size:17px;
 min-height:60px;
 }
 
-.footer{
-margin-top:10px;
-font-size:13px;
-opacity:0.8;
+/* Confetti */
+
+.confetti{
+position:fixed;
+top:-10px;
+width:10px;
+height:10px;
+background:red;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(100vh) rotate(720deg);
+}
+}
+
+/* Responsive */
+
+@media(max-width:900px){
+.grid{
+grid-template-columns:repeat(5,1fr);
+}
+}
+
+@media(max-width:600px){
+.grid{
+grid-template-columns:repeat(3,1fr);
+}
+}
+
+@media(max-width:400px){
+.grid{
+grid-template-columns:repeat(2,1fr);
+}
 }
 
 </style>
@@ -99,30 +158,25 @@ opacity:0.8;
 
 <div class="container">
 
-<h1>🎉 Happiness Journey Game</h1>
+<h1>🎉 Happiness Journey</h1>
 
 <div class="controls">
 
-<label>Select Your Genre</label>
-<br><br>
-
 <select id="genre">
 <option value="fitness">💪 Fitness</option>
-<option value="artist">🎨 Artist</option>
+<option value="artist">🎨 Creative </option>
 <option value="mind">🌿 Inner Peace</option>
-<option value="social">Social ❤️ r</option>
+<option value="social">❤️ Social</option>
 </select>
 
 </div>
 
+<div class="dice" id="dice">🎲</div>
+
 <div class="grid" id="board"></div>
 
 <div class="result" id="result">
-Tap a board number to reveal your task!
-</div>
-
-<div class="footer">
-Scan • Play • Spread Happiness ✨
+Tap a number to reveal your task!
 </div>
 
 </div>
@@ -136,86 +190,144 @@ fitness:[
 "Do 10 squats while smiling.",
 "Take 5 deep breaths and lead the group.",
 "Share one healthy habit you want to build.",
-"Do 10 pushups or knee pushups.",
+"Do 10 pushups.",
 "Teach one quick stretch.",
-"Rate your energy level from 1-10."
+"Rate your energy level."
 ],
 
 artist:[
-"Draw your current mood in 30 seconds.",
-"Create a 4-line poem about happiness.",
+"Draw your current mood.",
+"Create a 4-line poem.",
 "Act out an emotion silently.",
-"Doodle something using only circles.",
+"Doodle using only circles.",
 "Create a motivational slogan.",
 "Describe your dream life in 3 words.",
-"Collaborate to make a quick story.",
-"Share a moment creativity made you happy."
+"Collaborate to make a story.",
+"Share a creative moment."
 ],
 
 mind:[
-"Share one thing you're grateful for.",
-"Close eyes for 20 seconds and describe sounds.",
+"Share something you're grateful for.",
+"Close eyes and describe sounds.",
 "Say a positive affirmation.",
 "Share a challenge that made you stronger.",
-"Compliment yourself genuinely.",
+"Compliment yourself.",
 "Describe your ideal peaceful day.",
-"Name one small win this week.",
+"Share a small win.",
 "Forgive yourself for something small."
 ],
 
 social:[
-"Give a genuine compliment to a player.",
-"Make the group laugh in 15 seconds.",
+"Give a compliment to a player.",
+"Make everyone laugh.",
 "Thank someone sincerely.",
-"Ask another player a meaningful question.",
-"Say something that would cheer someone up.",
-"Share what friendship means to you.",
-"Do a 10-second handshake with someone.",
-"Share one way to spread kindness."
+"Ask a meaningful question.",
+"Say something uplifting.",
+"Share what friendship means.",
+"Do a 10-second handshake.",
+"Share a kindness idea."
 ]
 };
 
 const specialCards=[
-"⭐ Roll the dice again and move forward!",
-"⭐ Choose a player. They must complete 2 tasks next turn.",
-"⭐ You may skip your next task.",
-"⭐ Everyone shares one gratitude moment.",
-"⭐ Swap positions with another player.",
-"⭐ Gain 2 Happiness Points!"
+"⭐ Roll again and move forward!",
+"⭐ Choose a player to do 2 tasks.",
+"⭐ Skip your next task.",
+"⭐ Everyone shares gratitude.",
+"⭐ Swap places with another player.",
+"⭐ Gain 2 happiness points!"
 ];
 
 const board=document.getElementById("board");
+const result=document.getElementById("result");
+const dice=document.getElementById("dice");
+
+let activeCell=null;
+
+/* create board */
 
 for(let i=2;i<=49;i++){
 
 const cell=document.createElement("div");
-
 cell.className="cell";
 cell.innerText=i;
 
 cell.onclick=function(){
-getTask(i);
+rollDice();
+selectCell(cell,i);
 };
 
 board.appendChild(cell);
+
 }
 
-function getTask(position){
+/* dice animation */
+
+function rollDice(){
+
+dice.classList.add("roll");
+
+setTimeout(()=>{
+dice.classList.remove("roll");
+},600);
+
+}
+
+/* highlight cell */
+
+function selectCell(cell,pos){
+
+if(activeCell){
+activeCell.classList.remove("active");
+}
+
+cell.classList.add("active");
+activeCell=cell;
+
+showTask(pos);
+
+}
+
+/* show task */
+
+function showTask(position){
 
 const genre=document.getElementById("genre").value;
-const result=document.getElementById("result");
 
 if(position%7===0){
 
 const special=specialCards[Math.floor(Math.random()*specialCards.length)];
+
 result.innerText=special;
+
+confetti();
 
 }
 else{
 
-const genreTasks=tasks[genre];
-const task=genreTasks[Math.floor(Math.random()*genreTasks.length)];
+const task=tasks[genre][Math.floor(Math.random()*tasks[genre].length)];
+
 result.innerText=task;
+
+}
+
+}
+
+/* confetti */
+
+function confetti(){
+
+for(let i=0;i<50;i++){
+
+const c=document.createElement("div");
+c.className="confetti";
+
+c.style.left=Math.random()*100+"vw";
+c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+
+document.body.appendChild(c);
+
+setTimeout(()=>c.remove(),3000);
 
 }
 
