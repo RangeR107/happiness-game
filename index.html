@@ -1,157 +1,180 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Happiness Journey</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
 
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:'Poppins',sans-serif;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins}
 
 body{
-background:linear-gradient(135deg,#5f9cff,#7c4dff);
+background:linear-gradient(135deg,#5c8cff,#7c4dff);
 min-height:100vh;
 display:flex;
 justify-content:center;
-align-items:center;
-padding:15px;
+padding:20px;
 color:white;
 }
 
 .container{
 width:100%;
 max-width:900px;
-background:rgba(255,255,255,0.1);
-backdrop-filter:blur(15px);
-border-radius:20px;
-padding:20px;
 text-align:center;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
 
-h1{
-margin-bottom:15px;
-}
+.setup{margin-bottom:20px}
 
-.controls{
-margin-bottom:15px;
-}
-
-select{
-padding:10px;
-border-radius:10px;
+input,select{
+padding:8px;
+margin:5px;
+border-radius:8px;
 border:none;
-font-size:16px;
 }
 
-/* Dice */
-
-.dice{
-font-size:50px;
-margin:10px;
-transition:transform 0.3s;
+button{
+padding:10px 15px;
+border:none;
+border-radius:10px;
+background:#ffd54f;
+font-weight:bold;
+cursor:pointer;
 }
 
-.roll{
-animation:spin 0.6s;
+.turn{
+margin-top:12px;
+font-size:18px;
+font-weight:bold;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:8px;
 }
 
-@keyframes spin{
-0%{transform:rotate(0)}
-100%{transform:rotate(360deg)}
+/* token indicator beside name */
+
+.playerToken{
+width:16px;
+height:16px;
+border-radius:50%;
+display:inline-block;
 }
 
-/* Board */
+/* 3D dice */
 
-.grid{
+.scene{
+width:60px;
+height:60px;
+margin:15px auto;
+perspective:600px;
+}
+
+.cube{
+width:60px;
+height:60px;
+position:relative;
+transform-style:preserve-3d;
+transition:transform 1s;
+}
+
+.face{
+position:absolute;
+width:60px;
+height:60px;
+background:white;
+color:black;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+border-radius:10px;
+border:1px solid #ccc;
+}
+
+.front{transform:rotateY(0deg) translateZ(30px)}
+.back{transform:rotateY(180deg) translateZ(30px)}
+.right{transform:rotateY(90deg) translateZ(30px)}
+.left{transform:rotateY(-90deg) translateZ(30px)}
+.top{transform:rotateX(90deg) translateZ(30px)}
+.bottom{transform:rotateX(-90deg) translateZ(30px)}
+
+.board{
 display:grid;
-gap:10px;
-margin-top:10px;
 grid-template-columns:repeat(7,1fr);
+gap:10px;
+margin-top:20px;
 }
 
 .cell{
 background:white;
 color:#333;
+height:70px;
 border-radius:12px;
-padding:16px;
-font-weight:600;
-cursor:pointer;
-box-shadow:0 4px 12px rgba(0,0,0,0.15);
-transition:0.2s;
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
-.cell:hover{
-transform:scale(1.1);
-background:#ffd54f;
+.special{
+background:#ffe082;
 }
 
-/* selected tile */
+/* tokens */
 
-.active{
-background:#ff7043 !important;
-color:white;
-transform:scale(1.15);
+.token{
+width:18px;
+height:18px;
+border-radius:50%;
+position:absolute;
+bottom:6px;
 }
 
-/* Result */
+/* popup */
 
-.result{
-margin-top:15px;
-background:rgba(255,255,255,0.2);
-padding:15px;
-border-radius:12px;
-font-size:17px;
-min-height:60px;
+.popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.7);
+display:flex;
+justify-content:center;
+align-items:center;
+visibility:hidden;
 }
 
-/* Confetti */
+.popupContent{
+background:white;
+color:black;
+padding:25px;
+border-radius:15px;
+width:80%;
+max-width:400px;
+}
+
+/* confetti */
 
 .confetti{
 position:fixed;
 top:-10px;
 width:10px;
 height:10px;
-background:red;
 animation:fall 3s linear forwards;
 }
 
 @keyframes fall{
-to{
-transform:translateY(100vh) rotate(720deg);
-}
-}
-
-/* Responsive */
-
-@media(max-width:900px){
-.grid{
-grid-template-columns:repeat(5,1fr);
-}
-}
-
-@media(max-width:600px){
-.grid{
-grid-template-columns:repeat(3,1fr);
-}
-}
-
-@media(max-width:400px){
-.grid{
-grid-template-columns:repeat(2,1fr);
-}
+to{transform:translateY(100vh) rotate(720deg)}
 }
 
 </style>
+
 </head>
 
 <body>
@@ -160,174 +183,286 @@ grid-template-columns:repeat(2,1fr);
 
 <h1>🎉 Happiness Journey</h1>
 
-<div class="controls">
+<div class="setup">
 
-<select id="genre">
-<option value="fitness">💪 Fitness</option>
-<option value="artist">🎨 Creative </option>
-<option value="mind">🌿 Inner Peace</option>
-<option value="social">❤️ Social</option>
+<div>
+<input id="p1" placeholder="Player 1">
+<select id="g1">
+<option value="fitness">Fitness</option>
+<option value="artist">Artist</option>
+<option value="mind">Mindfulness</option>
+<option value="social">Social</option>
 </select>
+</div>
+
+<div>
+<input id="p2" placeholder="Player 2">
+<select id="g2">
+<option value="fitness">Fitness</option>
+<option value="artist">Artist</option>
+<option value="mind">Mindfulness</option>
+<option value="social">Social</option>
+</select>
+</div>
+
+<div>
+<input id="p3" placeholder="Player 3">
+<select id="g3">
+<option value="fitness">Fitness</option>
+<option value="artist">Artist</option>
+<option value="mind">Mindfulness</option>
+<option value="social">Social</option>
+</select>
+</div>
+
+<div>
+<input id="p4" placeholder="Player 4">
+<select id="g4">
+<option value="fitness">Fitness</option>
+<option value="artist">Artist</option>
+<option value="mind">Mindfulness</option>
+<option value="social">Social</option>
+</select>
+</div>
+
+<button onclick="startGame()">Start Game</button>
 
 </div>
 
-<div class="dice" id="dice">🎲</div>
+<div id="gameArea" style="display:none">
 
-<div class="grid" id="board"></div>
+<div id="turnText" class="turn"></div>
 
-<div class="result" id="result">
-Tap a number to reveal your task!
+<div class="scene">
+<div class="cube" id="cube">
+<div class="face front">1</div>
+<div class="face back">6</div>
+<div class="face right">3</div>
+<div class="face left">4</div>
+<div class="face top">5</div>
+<div class="face bottom">2</div>
+</div>
 </div>
 
+<button onclick="rollDice()">Roll Dice</button>
+
+<div id="board" class="board"></div>
+
+<div id="winner" style="margin-top:15px;font-size:22px"></div>
+
+</div>
+
+</div>
+
+<div class="popup" id="popup">
+<div class="popupContent">
+<h3>Task</h3>
+<p id="taskText"></p>
+<button onclick="closePopup()">Done</button>
+</div>
 </div>
 
 <script>
 
 const tasks={
-fitness:[
-"Do 15 jumping jacks.",
-"Hold a plank for 20 seconds.",
-"Do 10 squats while smiling.",
-"Take 5 deep breaths and lead the group.",
-"Share one healthy habit you want to build.",
-"Do 10 pushups.",
-"Teach one quick stretch.",
-"Rate your energy level."
-],
+fitness:["Do 10 jumping jacks","Hold plank 20 sec","Share a healthy habit","Lead deep breathing"],
+artist:["Draw your mood","Create a mini poem","Act an emotion","Design a slogan"],
+mind:["Say gratitude","Positive affirmation","Close eyes 20 sec","Share peaceful memory"],
+social:["Compliment a player","Make everyone laugh","Ask meaningful question","Share kindness idea"]
+}
 
-artist:[
-"Draw your current mood.",
-"Create a 4-line poem.",
-"Act out an emotion silently.",
-"Doodle using only circles.",
-"Create a motivational slogan.",
-"Describe your dream life in 3 words.",
-"Collaborate to make a story.",
-"Share a creative moment."
-],
+const specialTiles=[7,14,21,28,35,42]
 
-mind:[
-"Share something you're grateful for.",
-"Close eyes and describe sounds.",
-"Say a positive affirmation.",
-"Share a challenge that made you stronger.",
-"Compliment yourself.",
-"Describe your ideal peaceful day.",
-"Share a small win.",
-"Forgive yourself for something small."
-],
+let players=[]
+let genres=[]
+let positions=[]
+let colors=["red","blue","green","yellow"]
+let currentPlayer=0
 
-social:[
-"Give a compliment to a player.",
-"Make everyone laugh.",
-"Thank someone sincerely.",
-"Ask a meaningful question.",
-"Say something uplifting.",
-"Share what friendship means.",
-"Do a 10-second handshake.",
-"Share a kindness idea."
-]
-};
+function startGame(){
 
-const specialCards=[
-"⭐ Roll again and move forward!",
-"⭐ Choose a player to do 2 tasks.",
-"⭐ Skip your next task.",
-"⭐ Everyone shares gratitude.",
-"⭐ Swap places with another player.",
-"⭐ Gain 2 happiness points!"
-];
+let names=[p1.value,p2.value,p3.value,p4.value]
+let gs=[g1.value,g2.value,g3.value,g4.value]
 
-const board=document.getElementById("board");
-const result=document.getElementById("result");
-const dice=document.getElementById("dice");
+names.forEach((n,i)=>{
+if(n!=""){
+players.push(n)
+genres.push(gs[i])
+positions.push(1)
+}
+})
 
-let activeCell=null;
+document.querySelector(".setup").style.display="none"
+document.getElementById("gameArea").style.display="block"
 
-/* create board */
-
-for(let i=2;i<=49;i++){
-
-const cell=document.createElement("div");
-cell.className="cell";
-cell.innerText=i;
-
-cell.onclick=function(){
-rollDice();
-selectCell(cell,i);
-};
-
-board.appendChild(cell);
+createBoard()
+updateTurn()
 
 }
 
-/* dice animation */
+function createBoard(){
+
+let board=document.getElementById("board")
+
+for(let i=1;i<=49;i++){
+
+let cell=document.createElement("div")
+cell.className="cell"
+cell.id="cell"+i
+cell.innerText=i
+
+if(specialTiles.includes(i)){
+cell.classList.add("special")
+}
+
+board.appendChild(cell)
+
+}
+
+renderTokens()
+
+}
+
+function renderTokens(){
+
+players.forEach((p,i)=>{
+
+let token=document.createElement("div")
+token.className="token"
+token.style.background=colors[i]
+
+let pos=positions[i]
+
+token.style.left=(i*18)+"px"
+
+document.getElementById("cell"+pos).appendChild(token)
+
+})
+
+}
 
 function rollDice(){
 
-dice.classList.add("roll");
+let cube=document.getElementById("cube")
 
-setTimeout(()=>{
-dice.classList.remove("roll");
-},600);
+let roll=Math.floor(Math.random()*6)+1
+
+let rotations={
+1:"rotateX(0deg) rotateY(0deg)",
+2:"rotateX(-90deg)",
+3:"rotateY(90deg)",
+4:"rotateY(-90deg)",
+5:"rotateX(90deg)",
+6:"rotateY(180deg)"
+}
+
+cube.style.transform=rotations[roll]
+
+setTimeout(()=>movePlayer(roll),1000)
 
 }
 
-/* highlight cell */
+function movePlayer(steps){
 
-function selectCell(cell,pos){
+let interval=setInterval(()=>{
 
-if(activeCell){
-activeCell.classList.remove("active");
-}
+positions[currentPlayer]++
 
-cell.classList.add("active");
-activeCell=cell;
+updateBoard()
 
-showTask(pos);
+if(positions[currentPlayer]>=49){
 
-}
-
-/* show task */
-
-function showTask(position){
-
-const genre=document.getElementById("genre").value;
-
-if(position%7===0){
-
-const special=specialCards[Math.floor(Math.random()*specialCards.length)];
-
-result.innerText=special;
-
-confetti();
-
-}
-else{
-
-const task=tasks[genre][Math.floor(Math.random()*tasks[genre].length)];
-
-result.innerText=task;
+positions[currentPlayer]=49
+clearInterval(interval)
+showWinner()
+return
 
 }
 
+steps--
+
+if(steps==0){
+
+clearInterval(interval)
+showTask()
+
 }
 
-/* confetti */
+},300)
+
+}
+
+function updateBoard(){
+
+document.querySelectorAll(".token").forEach(t=>t.remove())
+renderTokens()
+
+}
+
+function showTask(){
+
+let text=""
+
+if(specialTiles.includes(positions[currentPlayer])){
+
+text="⭐ Special Tile! Everyone share something you're grateful for!"
+confetti()
+
+}else{
+
+let genre=genres[currentPlayer]
+let list=tasks[genre]
+text=list[Math.floor(Math.random()*list.length)]
+
+}
+
+document.getElementById("taskText").innerText=text
+document.getElementById("popup").style.visibility="visible"
+
+}
+
+function closePopup(){
+
+document.getElementById("popup").style.visibility="hidden"
+
+currentPlayer=(currentPlayer+1)%players.length
+
+updateTurn()
+
+}
+
+function updateTurn(){
+
+let tokenColor=colors[currentPlayer]
+
+document.getElementById("turnText").innerHTML=
+`<span class="playerToken" style="background:${tokenColor}"></span>
+Turn: ${players[currentPlayer]} (${genres[currentPlayer]})`
+
+}
+
+function showWinner(){
+
+document.getElementById("winner").innerText=
+players[currentPlayer]+" Wins! 🎉"
+
+confetti()
+
+}
 
 function confetti(){
 
-for(let i=0;i<50;i++){
+for(let i=0;i<80;i++){
 
-const c=document.createElement("div");
-c.className="confetti";
+let c=document.createElement("div")
+c.className="confetti"
 
-c.style.left=Math.random()*100+"vw";
-c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+c.style.left=Math.random()*100+"vw"
+c.style.background=`hsl(${Math.random()*360},100%,50%)`
 
-document.body.appendChild(c);
+document.body.appendChild(c)
 
-setTimeout(()=>c.remove(),3000);
+setTimeout(()=>c.remove(),3000)
 
 }
 
