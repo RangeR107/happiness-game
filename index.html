@@ -22,7 +22,7 @@ color:white;
 
 .container{
 width:100%;
-max-width:900px;
+max-width:1000px;
 text-align:center;
 }
 
@@ -45,8 +45,7 @@ cursor:pointer;
 }
 
 .turn{
-margin-top:12px;
-font-size:18px;
+margin-top:10px;
 font-weight:bold;
 display:flex;
 justify-content:center;
@@ -54,16 +53,12 @@ align-items:center;
 gap:8px;
 }
 
-/* token indicator beside name */
-
 .playerToken{
 width:16px;
 height:16px;
 border-radius:50%;
 display:inline-block;
 }
-
-/* 3D dice */
 
 .scene{
 width:60px;
@@ -89,9 +84,8 @@ color:black;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:22px;
 border-radius:10px;
-border:1px solid #ccc;
+font-size:22px;
 }
 
 .front{transform:rotateY(0deg) translateZ(30px)}
@@ -101,10 +95,19 @@ border:1px solid #ccc;
 .top{transform:rotateX(90deg) translateZ(30px)}
 .bottom{transform:rotateX(-90deg) translateZ(30px)}
 
+.bounce{animation:bounce .6s}
+
+@keyframes bounce{
+0%{transform:translateY(0)}
+40%{transform:translateY(-25px)}
+70%{transform:translateY(10px)}
+100%{transform:translateY(0)}
+}
+
 .board{
 display:grid;
 grid-template-columns:repeat(7,1fr);
-gap:10px;
+gap:8px;
 margin-top:20px;
 }
 
@@ -113,29 +116,39 @@ background:white;
 color:#333;
 height:70px;
 border-radius:12px;
-position:relative;
 display:flex;
 align-items:center;
 justify-content:center;
 font-weight:bold;
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
+position:relative;
 }
 
-.special{
-background:#ffe082;
-}
+.start{background:#81c784}
+.end{background:#ff8a65}
 
-/* tokens */
+.tokenContainer{
+position:absolute;
+bottom:4px;
+left:4px;
+right:4px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:2px;
+}
 
 .token{
-width:18px;
-height:18px;
+width:12px;
+height:12px;
 border-radius:50%;
-position:absolute;
-bottom:6px;
+margin:auto;
+animation:jump .25s;
 }
 
-/* popup */
+@keyframes jump{
+0%{transform:translateY(0)}
+50%{transform:translateY(-10px)}
+100%{transform:translateY(0)}
+}
 
 .popup{
 position:fixed;
@@ -159,18 +172,18 @@ width:80%;
 max-width:400px;
 }
 
-/* confetti */
-
-.confetti{
-position:fixed;
-top:-10px;
-width:10px;
-height:10px;
-animation:fall 3s linear forwards;
+.popupButtons{
+margin-top:15px;
+display:flex;
+gap:10px;
+justify-content:center;
 }
 
-@keyframes fall{
-to{transform:translateY(100vh) rotate(720deg)}
+.leaderboard{
+margin-top:20px;
+background:rgba(255,255,255,0.15);
+padding:15px;
+border-radius:12px;
 }
 
 </style>
@@ -185,45 +198,16 @@ to{transform:translateY(100vh) rotate(720deg)}
 
 <div class="setup">
 
-<div>
-<input id="p1" placeholder="Player 1">
-<select id="g1">
-<option value="fitness">Fitness</option>
-<option value="artist">Artist</option>
-<option value="mind">Mindfulness</option>
-<option value="social">Social</option>
-</select>
-</div>
+<label>Number of Players</label> <select id="playerCount" onchange="updateInputs()">
 
-<div>
-<input id="p2" placeholder="Player 2">
-<select id="g2">
-<option value="fitness">Fitness</option>
-<option value="artist">Artist</option>
-<option value="mind">Mindfulness</option>
-<option value="social">Social</option>
+<option value="">Select</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
 </select>
-</div>
 
-<div>
-<input id="p3" placeholder="Player 3">
-<select id="g3">
-<option value="fitness">Fitness</option>
-<option value="artist">Artist</option>
-<option value="mind">Mindfulness</option>
-<option value="social">Social</option>
-</select>
-</div>
-
-<div>
-<input id="p4" placeholder="Player 4">
-<select id="g4">
-<option value="fitness">Fitness</option>
-<option value="artist">Artist</option>
-<option value="mind">Mindfulness</option>
-<option value="social">Social</option>
-</select>
-</div>
+<div id="playerInputs"></div>
 
 <button onclick="startGame()">Start Game</button>
 
@@ -248,7 +232,10 @@ to{transform:translateY(100vh) rotate(720deg)}
 
 <div id="board" class="board"></div>
 
-<div id="winner" style="margin-top:15px;font-size:22px"></div>
+<div class="leaderboard">
+<h3>🏆 Happiness Leaderboard</h3>
+<div id="leaderboard"></div>
+</div>
 
 </div>
 
@@ -258,45 +245,111 @@ to{transform:translateY(100vh) rotate(720deg)}
 <div class="popupContent">
 <h3>Task</h3>
 <p id="taskText"></p>
-<button onclick="closePopup()">Done</button>
+
+<div class="popupButtons">
+<button onclick="taskCompleted()">Completed</button>
+<button onclick="taskSkipped()">Not Completed</button>
+</div>
+
 </div>
 </div>
 
 <script>
 
 const tasks={
-fitness:["Do 10 jumping jacks","Hold plank 20 sec","Share a healthy habit","Lead deep breathing"],
-artist:["Draw your mood","Create a mini poem","Act an emotion","Design a slogan"],
-mind:["Say gratitude","Positive affirmation","Close eyes 20 sec","Share peaceful memory"],
-social:["Compliment a player","Make everyone laugh","Ask meaningful question","Share kindness idea"]
-}
+fitness:[
+"Do 10 pushups",
+"Hold plank for 30 seconds",
+"Do 20 jumping jacks",
+"Share one workout tip that helped you",
+"Name 2 foods rich in protein",
+"Share a fitness habit you recommend",
+"Do 15 squats",
+"Take 5 deep breaths and stretch"
+],
 
-const specialTiles=[7,14,21,28,35,42]
+artist:[
+"Draw your current mood",
+"Create a 3-line story",
+"Sketch something using only circles",
+"Act an emotion silently",
+"Name a song that inspires creativity",
+"Create a 4 word motivational slogan",
+"Describe dream life in 3 words",
+"Draw an emoji representing yourself"
+],
+
+mind:[
+"Share something you're grateful for",
+"Say one positive affirmation",
+"Close eyes for 20 seconds",
+"Share a recent peaceful moment",
+"Name something you appreciate about yourself",
+"Take 3 slow deep breaths",
+"Describe your ideal peaceful day",
+"Share one small win this week"
+],
+
+social:[
+"Give someone a genuine compliment",
+"Ask someone a meaningful question",
+"Tell a short joke",
+"Share a kindness idea",
+"Thank someone in the room",
+"Name a quality you admire in friends",
+"Make everyone laugh in 15 seconds",
+"Share a memorable moment with friends"
+]
+}
 
 let players=[]
 let genres=[]
 let positions=[]
+let scores=[]
 let colors=["red","blue","green","yellow"]
 let currentPlayer=0
 
+function updateInputs(){
+
+let count=document.getElementById("playerCount").value
+let container=document.getElementById("playerInputs")
+container.innerHTML=""
+
+for(let i=1;i<=count;i++){
+
+container.innerHTML+=`
+<div>
+<input id="p${i}" placeholder="Player ${i}">
+<select id="g${i}">
+<option value="fitness">Fitness</option>
+<option value="artist">Artist</option>
+<option value="mind">Mindfulness</option>
+<option value="social">Social</option>
+</select>
+</div>
+`
+
+}
+
+}
+
 function startGame(){
 
-let names=[p1.value,p2.value,p3.value,p4.value]
-let gs=[g1.value,g2.value,g3.value,g4.value]
+let count=document.getElementById("playerCount").value
 
-names.forEach((n,i)=>{
-if(n!=""){
-players.push(n)
-genres.push(gs[i])
-positions.push(1)
+for(let i=1;i<=count;i++){
+players.push(document.getElementById("p"+i).value)
+genres.push(document.getElementById("g"+i).value)
+positions.push(0)
+scores.push(0)
 }
-})
 
 document.querySelector(".setup").style.display="none"
 document.getElementById("gameArea").style.display="block"
 
 createBoard()
 updateTurn()
+updateLeaderboard()
 
 }
 
@@ -304,16 +357,19 @@ function createBoard(){
 
 let board=document.getElementById("board")
 
-for(let i=1;i<=49;i++){
+for(let i=0;i<=50;i++){
+
+let label=i
+if(i==0) label="START"
+if(i==50) label="END"
 
 let cell=document.createElement("div")
 cell.className="cell"
-cell.id="cell"+i
-cell.innerText=i
 
-if(specialTiles.includes(i)){
-cell.classList.add("special")
-}
+if(i==0) cell.classList.add("start")
+if(i==50) cell.classList.add("end")
+
+cell.innerHTML=label+`<div class="tokenContainer" id="tokens${i}"></div>`
 
 board.appendChild(cell)
 
@@ -331,11 +387,7 @@ let token=document.createElement("div")
 token.className="token"
 token.style.background=colors[i]
 
-let pos=positions[i]
-
-token.style.left=(i*18)+"px"
-
-document.getElementById("cell"+pos).appendChild(token)
+document.getElementById("tokens"+positions[i]).appendChild(token)
 
 })
 
@@ -344,11 +396,10 @@ document.getElementById("cell"+pos).appendChild(token)
 function rollDice(){
 
 let cube=document.getElementById("cube")
-
 let roll=Math.floor(Math.random()*6)+1
 
 let rotations={
-1:"rotateX(0deg) rotateY(0deg)",
+1:"rotateX(0deg)",
 2:"rotateX(-90deg)",
 3:"rotateY(90deg)",
 4:"rotateY(-90deg)",
@@ -357,8 +408,12 @@ let rotations={
 }
 
 cube.style.transform=rotations[roll]
+cube.classList.add("bounce")
 
-setTimeout(()=>movePlayer(roll),1000)
+setTimeout(()=>{
+cube.classList.remove("bounce")
+movePlayer(roll)
+},600)
 
 }
 
@@ -368,27 +423,38 @@ let interval=setInterval(()=>{
 
 positions[currentPlayer]++
 
+if(positions[currentPlayer]>50) positions[currentPlayer]=50
+
 updateBoard()
-
-if(positions[currentPlayer]>=49){
-
-positions[currentPlayer]=49
-clearInterval(interval)
-showWinner()
-return
-
-}
 
 steps--
 
 if(steps==0){
 
 clearInterval(interval)
-showTask()
+checkSpecial()
 
 }
 
-},300)
+},250)
+
+}
+
+function checkSpecial(){
+
+if(positions[currentPlayer]!==0 && positions[currentPlayer] % 7 ===0){
+
+let roll=Math.floor(Math.random()*6)+1
+alert("⭐ Special Tile! Move backwards "+roll)
+
+positions[currentPlayer]-=roll
+if(positions[currentPlayer]<0) positions[currentPlayer]=0
+
+updateBoard()
+
+}
+
+showTask()
 
 }
 
@@ -401,70 +467,66 @@ renderTokens()
 
 function showTask(){
 
-let text=""
-
-if(specialTiles.includes(positions[currentPlayer])){
-
-text="⭐ Special Tile! Everyone share something you're grateful for!"
-confetti()
-
-}else{
-
 let genre=genres[currentPlayer]
 let list=tasks[genre]
-text=list[Math.floor(Math.random()*list.length)]
 
-}
+let task=list[Math.floor(Math.random()*list.length)]
 
-document.getElementById("taskText").innerText=text
+document.getElementById("taskText").innerText=task
 document.getElementById("popup").style.visibility="visible"
 
 }
 
-function closePopup(){
+function taskCompleted(){
+
+scores[currentPlayer]++
+finishTurn()
+
+}
+
+function taskSkipped(){
+
+finishTurn()
+
+}
+
+function finishTurn(){
 
 document.getElementById("popup").style.visibility="hidden"
 
-currentPlayer=(currentPlayer+1)%players.length
+updateLeaderboard()
 
+if(positions[currentPlayer]>=50){
+alert(players[currentPlayer]+" reached END! 🎉")
+}
+
+currentPlayer=(currentPlayer+1)%players.length
 updateTurn()
 
 }
 
 function updateTurn(){
 
-let tokenColor=colors[currentPlayer]
+let color=colors[currentPlayer]
 
 document.getElementById("turnText").innerHTML=
-`<span class="playerToken" style="background:${tokenColor}"></span>
+`<span class="playerToken" style="background:${color}"></span>
 Turn: ${players[currentPlayer]} (${genres[currentPlayer]})`
 
 }
 
-function showWinner(){
+function updateLeaderboard(){
 
-document.getElementById("winner").innerText=
-players[currentPlayer]+" Wins! 🎉"
+let board=document.getElementById("leaderboard")
 
-confetti()
+let data=players.map((p,i)=>({name:p,score:scores[i]}))
+data.sort((a,b)=>b.score-a.score)
 
-}
+board.innerHTML=""
 
-function confetti(){
-
-for(let i=0;i<80;i++){
-
-let c=document.createElement("div")
-c.className="confetti"
-
-c.style.left=Math.random()*100+"vw"
-c.style.background=`hsl(${Math.random()*360},100%,50%)`
-
-document.body.appendChild(c)
-
-setTimeout(()=>c.remove(),3000)
-
-}
+data.forEach((p,i)=>{
+board.innerHTML+=`${i+1}. ${p.name} — ${p.score} pts<br>`
+})
 
 }
 
